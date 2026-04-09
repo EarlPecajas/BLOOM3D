@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In - BLOOM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="signin-page">
+    <header class="top-nav">
+      <a href="index.html" class="brand-link">
+        <div class="brand-container">
+          <div class="brand-logo">🌸</div>
+          <div class="brand">
+            <span class="bloom-text">BLOOM</span>
+            <div class="brand-tagline">
+              <span>Botanical Locator</span>
+              <span>and Orchid Observation</span>
+              <span>Mapping System</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <div class="auth-actions"></div>
+    </header>
+
+    <main class="signin-container">
+      <section class="signin-form-wrapper">
+        <div class="signin-form">
+          <p class="signin-subtitle">Please enter your details</p>
+          <h1 class="signin-heading">Welcome back</h1>
+          
+          <form id="signin-form">
+            <input type="text" placeholder="Email address" class="form-input" id="username" required />
+            <input type="password" placeholder="Password" class="form-input" id="password" required />
+            
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" />
+                <span>Remember for 30 days</span>
+              </label>
+              <a href="#" class="forgot-password">Forgot password</a>
+            </div>
+            
+            <button type="submit" class="signin-btn">Sign In</button>
+            
+            <p class="signin-footer">
+              Don't have an account? <a href="register.html" class="signin-link">Sign Up</a>
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <aside class="signin-image-wrapper" aria-hidden="true">
+        <img src="./ghost orchid.webp" alt="Ghost Orchid" class="signin-image" />
+        <div class="signin-image-label">
+          <p class="orchid-name">GHOST ORCHID</p>
+          <p class="orchid-species">Dendrophylax lindenii</p>
+        </div>
+      </aside>
+    </main>
+
+    <script>
+      document.getElementById('signin-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        if (username === 'DENR' && password === '123') {
+          // Redirect to dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          alert('Invalid username or password. Try DENR / 123');
+        }
+      });
+    </script>
+  </body>
+</html>
