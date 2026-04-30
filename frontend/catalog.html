@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orchid Catalog - BLOOM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="signin-page bg-light">
+    <header class="top-nav navbar navbar-expand-lg px-3 px-md-4">
+      <a href="index.html" class="brand-link" id="catalog-brand-link">
+        <div class="brand-container">
+          <div class="brand-logo">
+            <img src="./loo.png" alt="Orchid logo" class="brand-logo-image" />
+          </div>
+          <div class="brand">
+            <span class="bloom-text">BLOOM</span>
+            <div class="brand-tagline">
+              <span>Botanical Locator</span>
+              <span>and Orchid Observation</span>
+              <span>Mapping System</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <div class="auth-actions d-flex align-items-center gap-2">
+        <a href="signin.html" class="btn btn-ghost btn-outline-secondary">Sign In</a>
+        <a href="register.html" class="btn btn-solid btn-success">Register</a>
+      </div>
+    </header>
+
+    <main class="catalog-container container-fluid py-4 px-3 px-md-4">
+      <div class="catalog-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div class="catalog-title-row">
+          <button
+            type="button"
+            class="catalog-view-toggle"
+            id="catalog-view-toggle"
+            aria-label="Switch to list view"
+            title="Switch to list view"
+          >
+            <span id="catalog-view-icon" aria-hidden="true">▦</span>
+          </button>
+          <h1 class="catalog-title">Orchid Catalog</h1>
+        </div>
+        <div class="catalog-search-wrapper d-flex flex-column flex-md-row gap-2 w-100 justify-content-lg-end" style="max-width:min(520px,100%);">
+          <select id="search-filter" class="catalog-search-filter form-select form-select-sm flex-shrink-0" style="width:140px;" aria-label="Search filter">
+            <option value="all">All</option>
+            <option value="family">Family</option>
+            <option value="species">Species</option>
+          </select>
+          <input type="text" placeholder="🔍 Search orchids..." class="catalog-search form-control form-control-sm flex-grow-1" id="search-input" style="max-width:360px;" />
+        </div>
+      </div>
+
+      <div class="catalog-grid" id="catalog-grid"></div>
+    </main>
+
+    <div class="orchid-detail-modal" id="orchid-detail-modal" hidden>
+      <div class="orchid-detail-card" role="dialog" aria-modal="true" aria-labelledby="orchid-detail-title">
+        <div class="orchid-showcase-row">
+          <h3 class="orchid-showcase-name" id="orchid-showcase-name">Flower Name</h3>
+          <div class="orchid-sample-images" aria-label="Sample photos">
+            <img src="./catalogicon.png" alt="Sample orchid photo" class="orchid-sample-image" id="sample-photo-1" />
+            <img src="./catalogicon.png" alt="Sample orchid photo" class="orchid-sample-image" id="sample-photo-2" />
+            <img src="./catalogicon.png" alt="Sample orchid photo" class="orchid-sample-image" id="sample-photo-3" />
+          </div>
+          <a href="gallery.html" class="see-gallery-link" id="see-gallery-link">See Gallery</a>
+        </div>
+
+        <div class="orchid-detail-header">
+          <h2 class="orchid-detail-title" id="orchid-detail-title">INFORMATION</h2>
+          <button type="button" class="contributors-toggle" id="contributors-toggle" aria-expanded="false">CONTRIBUTORS</button>
+        </div>
+        <div class="contributors-panel" id="contributors-panel" hidden>
+          <div class="contributor-item">
+            <p class="contributor-name">Aljohn Jay L. Saavedra</p>
+            <p class="contributor-date">Contributed: March 14, 2024</p>
+          </div>
+          <div class="contributor-item">
+            <p class="contributor-name">Kier Mitchel E. Pitogo</p>
+            <p class="contributor-date">Contributed: October 22, 2024</p>
+          </div>
+        </div>
+        <div class="orchid-detail-grid" id="orchid-detail-grid">
+          <div class="orchid-detail-row" id="row-scientific-name"><span class="orchid-detail-label">Scientific Name</span><span id="detail-scientific-name" class="scientific-name">-</span></div>
+          <div class="orchid-detail-row" id="row-genus"><span class="orchid-detail-label">Genus</span><span id="detail-genus">-</span></div>
+          <div class="orchid-detail-row" id="row-common-name"><span class="orchid-detail-label">Common Name</span><span id="detail-common-name">-</span></div>
+          <div class="orchid-detail-row" id="row-endemicity"><span class="orchid-detail-label">Endemicity</span><span id="detail-endemicity">-</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="image-lightbox" id="catalog-image-lightbox" hidden>
+      <img src="" alt="Full orchid view" id="catalog-lightbox-image" class="image-lightbox-photo" />
+    </div>
+
+    <script>
+      const catalogGrid = document.getElementById('catalog-grid');
+      const searchInput = document.getElementById('search-input');
+      const searchFilter = document.getElementById('search-filter');
+      const catalogViewToggle = document.getElementById('catalog-view-toggle');
+      const catalogViewIcon = document.getElementById('catalog-view-icon');
+      const catalogBrandLink = document.getElementById('catalog-brand-link');
+      const catalogAuthActions = document.querySelector('.auth-actions');
+      const orchidDetailModal = document.getElementById('orchid-detail-modal');
+      const orchidDetailTitle = document.getElementById('orchid-detail-title');
+      const orchidDetailGrid = document.getElementById('orchid-detail-grid');
+      const contributorsToggle = document.getElementById('contributors-toggle');
+      const contributorsPanel = document.getElementById('contributors-panel');
+      const orchidShowcaseName = document.getElementById('orchid-showcase-name');
+      const seeGalleryLink = document.getElementById('see-gallery-link');
+      const samplePhotoOne = document.getElementById('sample-photo-1');
+      const samplePhotoTwo = document.getElementById('sample-photo-2');
+      const samplePhotoThree = document.getElementById('sample-photo-3');
+      const catalogImageLightbox = document.getElementById('catalog-image-lightbox');
+      const catalogLightboxImage = document.getElementById('catalog-lightbox-image');
+      const catalogImage = encodeURI('./catalogicon.png');
+      const showcaseImages = ['./orchid1.webp', './orchid2.jpg', './orchid3.webp'];
+      let orchids = [];
+      let isListView = false;
+
+      const activeUser = localStorage.getItem('bloomUser');
+      if (activeUser) {
+        catalogBrandLink.href = 'dashboard.html?view=orchids';
+        if (catalogAuthActions) {
+          catalogAuthActions.innerHTML = '<a href="dashboard.html?view=orchids" class="btn btn-solid">Back to Dashboard</a>';
+        }
+      }
+
+      function hasUsableValue(value) {
+        if (value === null || value === undefined) {
+          return false;
+        }
+
+        const normalized = String(value).trim().toLowerCase();
+        if (normalized === '') {
+          return false;
+        }
+
+        const unavailableTokens = new Set(['none', 'n/a', 'na', 'not available', 'null', 'unknown', '-']);
+        return !unavailableTokens.has(normalized);
+      }
+
+      function setDetailRow(rowId, valueId, value) {
+        const rowEl = document.getElementById(rowId);
+        const valueEl = document.getElementById(valueId);
+        const isAvailable = hasUsableValue(value);
+
+        rowEl.hidden = !isAvailable;
+        if (isAvailable) {
+          valueEl.textContent = String(value).trim();
+        } else {
+          valueEl.textContent = '';
+        }
+      }
+
+      function setContributorsView(showContributors) {
+        contributorsPanel.hidden = !showContributors;
+        orchidDetailGrid.hidden = showContributors;
+        orchidDetailGrid.style.display = showContributors ? 'none' : 'grid';
+        orchidDetailTitle.textContent = showContributors ? 'CONTRIBUTORS' : 'INFORMATION';
+        contributorsToggle.setAttribute('aria-expanded', String(showContributors));
+      }
+
+      function openCatalogLightbox(imageSrc) {
+        catalogLightboxImage.src = imageSrc;
+        catalogImageLightbox.hidden = false;
+      }
+
+      function closeCatalogLightbox() {
+        catalogLightboxImage.src = '';
+        catalogImageLightbox.hidden = true;
+      }
+
+      function openOrchidDetails(orchid) {
+        const orchidName = hasUsableValue(orchid.name) ? String(orchid.name).trim() : 'Flower';
+        orchidShowcaseName.textContent = orchidName;
+        seeGalleryLink.href = `gallery.html?name=${encodeURIComponent(orchidName)}`;
+        samplePhotoOne.src = showcaseImages[0];
+        samplePhotoTwo.src = showcaseImages[1];
+        samplePhotoThree.src = showcaseImages[2];
+
+        setContributorsView(false);
+        setDetailRow('row-scientific-name', 'detail-scientific-name', orchid.name);
+        setDetailRow('row-genus', 'detail-genus', orchid.genus);
+        setDetailRow('row-common-name', 'detail-common-name', orchid.common_name);
+        setDetailRow('row-endemicity', 'detail-endemicity', orchid.endemicity);
+        orchidDetailModal.hidden = false;
+      }
+
+      function closeOrchidDetails() {
+        orchidShowcaseName.textContent = 'Flower Name';
+        seeGalleryLink.href = 'gallery.html';
+        setContributorsView(false);
+        closeCatalogLightbox();
+        orchidDetailModal.hidden = true;
+      }
+
+      function syncCatalogViewState() {
+        catalogGrid.classList.toggle('list-view', isListView);
+
+        if (catalogViewIcon) {
+          catalogViewIcon.textContent = isListView ? '☰' : '▦';
+        }
+
+        if (catalogViewToggle) {
+          const nextModeLabel = isListView ? 'catalog' : 'list';
+          const label = `Switch to ${nextModeLabel} view`;
+          catalogViewToggle.setAttribute('aria-label', label);
+          catalogViewToggle.setAttribute('title', label);
+        }
+      }
+
+      function renderCatalog(items) {
+        catalogGrid.innerHTML = items.map((orchid) => `
+          <button type="button" class="orchid-card orchid-card-button" data-orchid-id="${orchid.id}">
+            <img src="${catalogImage}" alt="${orchid.name}" class="orchid-card-image" />
+            <div class="orchid-card-info">
+              <p class="orchid-card-name scientific-name">${orchid.name}</p>
+              <p class="orchid-card-genus">${orchid.genus}</p>
+            </div>
+          </button>
+        `).join('');
+      }
+
+      function applySearchFilter() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const filterValue = searchFilter.value;
+
+        const filtered = orchids.filter((orchid) => {
+          const name = (orchid.name || '').toLowerCase();
+          const genus = (orchid.genus || '').toLowerCase();
+
+          if (!searchTerm) {
+            return true;
+          }
+
+          if (filterValue === 'family') {
+            return genus.includes(searchTerm);
+          }
+
+          if (filterValue === 'species') {
+            return name.includes(searchTerm);
+          }
+
+          return name.includes(searchTerm) || genus.includes(searchTerm);
+        });
+
+        renderCatalog(filtered);
+      }
+
+      async function loadCatalog() {
+        try {
+          const response = await fetch('/api/orchids');
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to load catalog');
+          }
+
+          orchids = data;
+          renderCatalog(orchids);
+        } catch (error) {
+          catalogGrid.innerHTML = '<p>Could not load orchids from database.</p>';
+        }
+      }
+
+      searchInput.addEventListener('input', function(e) {
+        applySearchFilter();
+      });
+
+      searchFilter.addEventListener('change', function() {
+        applySearchFilter();
+      });
+
+      if (catalogViewToggle) {
+        catalogViewToggle.addEventListener('click', function() {
+          isListView = !isListView;
+          syncCatalogViewState();
+        });
+      }
+
+      catalogGrid.addEventListener('click', function(e) {
+        const card = e.target.closest('[data-orchid-id]');
+        if (!card) {
+          return;
+        }
+
+        const orchidId = card.getAttribute('data-orchid-id');
+        const selectedOrchid = orchids.find((orchid) => String(orchid.id) === String(orchidId));
+
+        if (selectedOrchid) {
+          openOrchidDetails(selectedOrchid);
+        }
+      });
+
+      contributorsToggle.addEventListener('click', function() {
+        const shouldShowContributors = contributorsPanel.hidden;
+        setContributorsView(shouldShowContributors);
+      });
+
+      [samplePhotoOne, samplePhotoTwo, samplePhotoThree].forEach(function(photoEl) {
+        photoEl.addEventListener('click', function() {
+          openCatalogLightbox(photoEl.src);
+        });
+      });
+
+      catalogImageLightbox.addEventListener('click', closeCatalogLightbox);
+
+      orchidDetailModal.addEventListener('click', function(e) {
+        if (e.target === orchidDetailModal) {
+          closeOrchidDetails();
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !catalogImageLightbox.hidden) {
+          closeCatalogLightbox();
+          return;
+        }
+
+        if (e.key === 'Escape' && !orchidDetailModal.hidden) {
+          closeOrchidDetails();
+        }
+      });
+
+      syncCatalogViewState();
+
+      loadCatalog();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
